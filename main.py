@@ -7,6 +7,8 @@ Convert .txt file containing graph matrix into integer nested arrays
 Params :
     file : path to the file containing the matrix
 """
+
+
 def import_matrix(file_path):
     graph = []
     with open(file_path, 'r') as matrix_file:
@@ -26,6 +28,8 @@ Params :
     nbNodes : How many nodes the graph will have
     probability : How much chances from 0 to 100 two nodes will be related 
 """
+
+
 def generate_graph(nbNodes, probability):
     graph = []
     for line in range(nbNodes):
@@ -60,34 +64,41 @@ def is_related_with_boolean(graph):
     else:
         return True
 
+
 def is_related_with_array(graph):
     to_treat = [0]
     already_treated = []
     while len(to_treat) != 0:
         treated_node = to_treat.pop()
-        for otherNode in range(0, len(graph[node])):
+        for otherNode in range(0, len(graph)):
             if otherNode not in to_treat and otherNode not in already_treated and graph[treated_node][otherNode] != 0:
-                to_treat.append(j)
-            already_treated.append(i)
+                to_treat.append(otherNode)
+            already_treated.append(treated_node)
     return len(graph) == len(already_treated)
+
 
 """
 Returns the list of the graph
 """
+
+
 def isthmus_list(graph):
     isthmus = []
     for node_x in range(0, len(graph)):
         for node_y in range(0, len(graph)):
-            if is_an_isthmus(graph,node_x,node_y):
+            if is_an_isthmus(graph, node_x, node_y):
                 isthmus.append([node_x, node_y])
     return isthmus
+
 
 def is_an_isthmus(graph, nodeX, nodeY):
     if graph[nodeX][nodeY]:
         for otherNode in range(0, len(graph)):
-            if graph[nodeX][otherNode] == graph[nodeY][otherNode] :
-                return false
-    return true
+            if graph[nodeX][otherNode] == graph[nodeY][otherNode]:
+                return False
+        return True
+    return False
+
 
 """
 Verify if a chain is in graph
@@ -95,6 +106,8 @@ Params :
     graph : analysed graph
     chain : the chain to check
 """
+
+
 def chain_in_graph(graph, chain):
     for node in range(0, len(chain) - 1):
         if graph[chain[node]][chain[node + 1]] == 0:
@@ -107,6 +120,8 @@ Returns an elementary chain
 Params : 
     chain : the chain to simplify
 """
+
+
 def elementary_chain(chain):
     for start in range(0, len(chain) - 1):
         for end in range(len(chain) - 1, start, -1):
@@ -149,5 +164,5 @@ if __name__ == '__main__':
     for i in range(len(graph)):
         print(graph[i])
     print(is_related_with_array(graph))
-    print(is_an_isthmus(graph,0,3))
+    print(is_an_isthmus(graph, 0, 3))
     print(isthmus_list(graph))
