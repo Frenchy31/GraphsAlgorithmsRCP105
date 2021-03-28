@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: <encoding name> -*-
+import copy
 import random
 
 """
@@ -46,6 +47,11 @@ def generate_graph(nbNodes, probability):
     return graph
 
 
+"""
+Verify if the given graph is related using a boolean
+"""
+
+
 def is_related_with_boolean(graph):
     nb_nodes = len(graph)
     markers = [0 for node in range(nb_nodes)]
@@ -65,39 +71,68 @@ def is_related_with_boolean(graph):
         return True
 
 
+"""
+Verify if the given graph is related using a boolean
+"""
+
+
 def is_related_with_array(graph):
     to_treat = [0]
     already_treated = []
     while len(to_treat) != 0:
         treated_node = to_treat.pop()
-        for otherNode in range(0, len(graph)):
-            if otherNode not in to_treat and otherNode not in already_treated and graph[treated_node][otherNode] != 0:
-                to_treat.append(otherNode)
+        for other_node in range(0, len(graph)):
+            if other_node not in to_treat and other_node not in already_treated and graph[treated_node][other_node] != 0:
+                to_treat.append(other_node)
             already_treated.append(treated_node)
     return len(graph) == len(already_treated)
 
 
 """
-Returns the list of the graph
+Returns the isthmus list from the graph
 """
 
 
 def isthmus_list(graph):
-    isthmus = []
+    isthmus_list = []
     for node_x in range(0, len(graph)):
         for node_y in range(0, len(graph)):
             if is_an_isthmus(graph, node_x, node_y):
-                isthmus.append([node_x, node_y])
-    return isthmus
+                isthmus_list.append([node_x, node_y])
+    return isthmus_list
+
+
+"""
+Check if the given nodes relationship is an isthmus inside the graph
+"""
 
 
 def is_an_isthmus(graph, nodeX, nodeY):
-    if graph[nodeX][nodeY]:
-        for otherNode in range(0, len(graph)):
-            if graph[nodeX][otherNode] == graph[nodeY][otherNode]:
+    if graph[nodeX][nodeY] == 1:
+        copy_graph = copy.deepcopy(graph)
+        copy_graph[nodeX][nodeY] = 0
+        copy_graph[nodeY][nodeX] = 0
+        x_graph = [nodeX]
+        get_related_nodes(copy_graph, nodeX, x_graph)
+        y_graph = [nodeY]
+        get_related_nodes(copy_graph, nodeY, y_graph)
+        for node in range(len(x_graph)):
+            if x_graph[node] in y_graph:
                 return False
         return True
     return False
+
+
+"""
+Recursive algorithm to obtain all the nodes attached to the starting node
+"""
+
+
+def get_related_nodes(graph, starting_node, related_nodes):
+    for otherNode in range(0, len(graph[starting_node])):
+        if graph[starting_node][otherNode] == 1 and otherNode not in related_nodes:
+            related_nodes.append(otherNode)
+            get_related_nodes(graph, starting_node, related_nodes)
 
 
 """
@@ -128,6 +163,16 @@ def elementary_chain(chain):
             if chain[end] == chain[start] and start < end:
                 chain = chain[0:start] + chain[end:len(chain)]
     return chain
+
+
+"""
+Simply prints graph adjacency matrix
+"""
+
+
+def print_graph_matrix(graph):
+    for i in range(len(graph)):
+        print(graph[i])
 
 
 if __name__ == '__main__':
@@ -161,8 +206,7 @@ if __name__ == '__main__':
     # else:
     #     print("La chaine saisie n'appartient pas au graphe.")
     graph = import_matrix('AdjacencyMatrixSamples/Graphe1Isthme.txt')
-    for i in range(len(graph)):
-        print(graph[i])
+
     print(is_related_with_array(graph))
     print(is_an_isthmus(graph, 0, 3))
     print(isthmus_list(graph))
