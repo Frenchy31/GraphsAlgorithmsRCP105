@@ -136,6 +136,46 @@ def get_related_nodes(graph, starting_node, related_nodes):
 
 
 """
+When traversing a graph, determine to which node to go without selecting an isthmus
+"""
+
+
+def select_node(graph, start_node):
+    nb_nodes = len(graph)
+    neighbours_nodes = []
+    for other_node in range(0, nb_nodes-1):
+        if graph[start_node][other_node] == 1:
+            neighbours_nodes.append(other_node)
+    for other_node in range(0, nb_nodes-1):
+        if not is_an_isthmus(graph, start_node, other_node):
+            return other_node
+    return neighbours_nodes.pop()
+
+
+"""
+When traversing a graph, determine to which node to go without selecting an isthmus
+"""
+
+
+def eulerian_cycle(graph, current_node):
+    print_graph_matrix(graph)
+    degree = 0
+    for other_nodes in range(0, len(graph)-1):
+        degree += graph[current_node][other_nodes]
+    if degree == 0:
+        return [current_node]
+    else:
+        next_node = select_node(graph, current_node)
+        graph[current_node][next_node] = 0
+        graph[next_node][current_node] = 0
+        print(current_node)
+        print(next_node)
+        print(graph[current_node][next_node])
+    return [next_node] + eulerian_cycle(graph, next_node)
+
+
+
+"""
 Verify if a chain is in graph
 Params :
     graph : analysed graph
@@ -171,8 +211,8 @@ Simply prints graph adjacency matrix
 
 
 def print_graph_matrix(graph):
-    for i in range(len(graph)):
-        print(graph[i])
+    for node in range(len(graph)):
+        print(graph[node])
 
 
 if __name__ == '__main__':
@@ -205,8 +245,12 @@ if __name__ == '__main__':
     #     print(chain)
     # else:
     #     print("La chaine saisie n'appartient pas au graphe.")
-    graph = import_matrix('AdjacencyMatrixSamples/Graphe1Isthme.txt')
+    # Sequence 4 : Isthmes
+    # graph = import_matrix('AdjacencyMatrixSamples/Graphe1Isthme')
+    # print(is_an_isthmus(graph, 0, 3))
+    # print(isthmus_list(graph))
+    graph = import_matrix('AdjacencyMatrixSamples/GrapheEulerien1.txt')
+    #print_graph_matrix(graph)
+    print(eulerian_cycle(graph, 0))
 
-    print(is_related_with_array(graph))
-    print(is_an_isthmus(graph, 0, 3))
-    print(isthmus_list(graph))
+
