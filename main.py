@@ -17,8 +17,7 @@ def import_matrix(file_path):
         for line in matrix_file.read().split('\n'):
             graph.append([])
             for value in line.split(' '):
-                if value == '0' or value == '1':
-                    graph[node].append(int(value))
+                graph[node].append(int(value))
             node += 1
     return graph
 
@@ -268,26 +267,72 @@ def reduce_chain_if_in_graph(graph, chain):
         print("La chaine saisie n'appartient pas au graphe.")
 
 
+def get_smaller_distance_with_node(graph, traveled_nodes):
+    min_distance = inf
+    for node in range(len(graph)):
+        for other_node in range(len(graph)):
+            if other_node not in traveled_nodes:
+                min_distance = graph
+
+
+def dijkstra(graph, start_node):
+    # Définition de l'infini par une valeur supérieure à la somme de tous les degrés du graphe
+    inf = sum(sum(node) for node in graph) + 1
+    nb_nodes = len(graph)
+    explored_nodes = {start_node: [0, [start_node]]}
+    # Association du sommet de départ avec une liste [longueur, plus court chemin]
+    nodes_to_explore = {other_node: [inf, ""] for other_node in range(nb_nodes) if other_node != start_node}
+    # Association de chaque autres sommets à explorer avec une liste [longueur, sommet précédent]
+    for next_node in range(nb_nodes):
+        if graph[start_node][next_node]:
+            nodes_to_explore[next_node] = [graph[start_node][next_node], start_node]
+    print("Plus courts chemins de")
+    # Tant qu'il reste des sommets à explorer
+    while nodes_to_explore and any(nodes_to_explore[other_node][0] < inf for other_node in nodes_to_explore):
+        # Récupération du sommet le plus proche et de sa clé
+        closest_node = min(nodes_to_explore, key=nodes_to_explore.get)
+        # Récupération longueur et sommet
+        len_to_closest_node, previous_closest_node = nodes_to_explore[closest_node]
+        for next_node in range(nb_nodes):
+            # Pour tout les sommets associés au plus proche et restants à explorer
+            if graph[closest_node][next_node] and next_node in nodes_to_explore:
+                # Mise à jour des distances si infèrieure
+                distance = len_to_closest_node + graph[closest_node][next_node]
+                if distance < nodes_to_explore[next_node][0]:
+                    nodes_to_explore[next_node] = [distance, closest_node]
+        # Ajout du noeud à la liste des noeuds parcourus
+        explored_nodes[closest_node] = [len_to_closest_node, explored_nodes[previous_closest_node][1] + [closest_node]]
+        # Suppression du sommet exploré de la liste
+        del nodes_to_explore[closest_node]
+        print("Longueur ", len_to_closest_node, ":", " -> ".join(map(str, explored_nodes[closest_node][1])))
+    # Dans le cas où le graphe est non connexe, on affiche les sommets non explorés
+    for other_node in nodes_to_explore:
+        print("Il n\'y a pas de chemin de {} à {}".format(start_node, other_node))
+    return explored_nodes
+
+
 if __name__ == '__main__':
     # Isthmus sequence
-    print("Dessin du graphe en entrée")
-    print("E          B\n"
-          "| \\      / |\n"
-          "|   A---D  |\n"
-          "| /      \\ |\n"
-          "F          C")
-    graph = import_matrix('AdjacencyMatrixSamples/Graphe1Isthme.txt')
+    # print("Dessin du graphe en entrée")
+    # print("E          B\n"
+    #       "| \\      / |\n"
+    #       "|   A---D  |\n"
+    #       "| /      \\ |\n"
+    #       "F          C")M
+    graph = import_matrix('AdjacencyMatrixSamples/Matrice10.txt')
     print('Matrice d\'adjacence correspondante')
     print_graph_matrix(graph)
-    print('Vérification de la fonction is_an_isthmus pour l\'arête A,D')
-    print(is_an_isthmus(graph, 0, 3))
-    print('Liste des isthmes')
-    print(isthmus_list(graph))
-    graph = import_matrix('AdjacencyMatrixSamples/GrapheEulerien1.txt')
+    dijkstra(graph, 0)
+    # print('Vérification de la fonction is_an_isthmus pour l\'arête A,D')
+    # print(is_an_isthmus(graph, 0, 3))
+    # print('Liste des isthmes')
+    # print(isthmus_list(graph))
+    # graph = import_matrix('AdjacencyMatrixSamples/GrapheEulerien1.txt')
     # print_graph_matrix(graph)
-    print(eulerian_cycle(graph, 0))
+    # print(eulerian_cycle(graph, 0))
     # Older sequences
     # graph = prompt_for_graph()
     # chain = prompt_for_chain()
     # reduce_chain_if_in_graph(graph,chain)
+
 
