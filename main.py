@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: <encoding name> -*-
+# -*- coding: UTF-8 -*-
 import copy
 import random
 
@@ -215,42 +215,79 @@ def print_graph_matrix(graph):
         print(graph[node])
 
 
-if __name__ == '__main__':
-    # Sequences 1 et 2
-    # print("Ce programme permet de générer un graphe aléatoire, puis de saisir une chaîne.")
-    # print("Si cette chaîne appartient au graphe, elle est ensuite transformée en chaîne élémentaire.")
-    # nbNodes = int(input("Combien de noeuds ?"))
-    # probability = -1
-    # while probability < 0 or probability > 100:
-    #     probability = float(input("Pourcentage de probabilités d'avoir une arête entre deux noeuds ? %"))
-    # print("Matrice d'adjacence du graphe généré : ")
-    # graph = generate_graph(nbNodes, probability)
-    # for i in range(nbNodes):
-    #     print(graph[i])
-    # chain = []
-    # print("Saisie de la chaine, entrez -1 quand la saisie est terminée.")
-    # chainNode = int(input("Noeud : "))
-    # while chainNode != -1:
-    #     if 0 <= chainNode < len(graph):
-    #         chain.append(chainNode)
-    #     else:
-    #         print("Le noeud saisi n'appartient pas au graphe.")
-    #     chainNode = int(input("Noeud : "))
-    # print("Chaine saisie : ")
-    # print(chain)
-    # if chain_in_graph(graph, chain):
-    #     print("La chaine saisie appartient bien au graphe.")
-    #     print("Chaine elementaire : ")
-    #     chain = elementary_chain(chain)
-    #     print(chain)
-    # else:
-    #     print("La chaine saisie n'appartient pas au graphe.")
-    # Sequence 4 : Isthmes
-    # graph = import_matrix('AdjacencyMatrixSamples/Graphe1Isthme')
-    # print(is_an_isthmus(graph, 0, 3))
-    # print(isthmus_list(graph))
-    graph = import_matrix('AdjacencyMatrixSamples/GrapheEulerien1.txt')
-    #print_graph_matrix(graph)
-    print(eulerian_cycle(graph, 0))
+###########################################################################################
+#                                    SEQUENCES DU COURS                                   #
+###########################################################################################
 
+"""
+Sequences 1 and 2
+"""
+
+
+def prompt_for_graph():
+    # Sequences 1 et 2
+    print("Ce programme permet de générer un graphe aléatoire, puis de saisir une chaîne.")
+    print("Si cette chaîne appartient au graphe, elle est ensuite transformée en chaîne élémentaire.")
+    nbNodes = int(input("Combien de noeuds ?"))
+    probability = -1
+    while probability < 0 or probability > 100:
+        probability = float(input("Pourcentage de probabilités d'avoir une arête entre deux noeuds ? %"))
+    print("Matrice d'adjacence du graphe généré : ")
+    graph = generate_graph(nbNodes, probability)
+    print_graph_matrix(graph)
+    return graph
+
+
+"""
+Chains sequence
+"""
+
+
+def prompt_for_chain():
+    chain = []
+    print("Saisie de la chaine, entrez -1 quand la saisie est terminée.")
+    chain_node = int(input("Noeud : "))
+    while chain_node != -1:
+        if 0 <= chain_node < len(graph):
+            chain.append(chain_node)
+        else:
+            print("Le noeud saisi n'appartient pas au graphe.")
+        chain_node = int(input("Noeud : "))
+    print("Chaine saisie : ")
+    print(chain)
+    return chain
+
+
+def reduce_chain_if_in_graph(graph, chain):
+    if chain_in_graph(graph, chain):
+        print("La chaine saisie appartient bien au graphe.")
+        print("Chaine elementaire : ")
+        chain = elementary_chain(chain)
+        print(chain)
+    else:
+        print("La chaine saisie n'appartient pas au graphe.")
+
+
+if __name__ == '__main__':
+    # Isthmus sequence
+    print("Dessin du graphe en entrée")
+    print("E          B\n"
+          "| \\      / |\n"
+          "|   A---D  |\n"
+          "| /      \\ |\n"
+          "F          C")
+    graph = import_matrix('AdjacencyMatrixSamples/Graphe1Isthme.txt')
+    print('Matrice d\'adjacence correspondante')
+    print_graph_matrix(graph)
+    print('Vérification de la fonction is_an_isthmus pour l\'arête A,D')
+    print(is_an_isthmus(graph, 0, 3))
+    print('Liste des isthmes')
+    print(isthmus_list(graph))
+    graph = import_matrix('AdjacencyMatrixSamples/GrapheEulerien1.txt')
+    # print_graph_matrix(graph)
+    print(eulerian_cycle(graph, 0))
+    # Older sequences
+    # graph = prompt_for_graph()
+    # chain = prompt_for_chain()
+    # reduce_chain_if_in_graph(graph,chain)
 
