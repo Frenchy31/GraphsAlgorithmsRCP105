@@ -142,10 +142,10 @@ When traversing a graph, determine to which node to go without selecting an isth
 def select_node(graph, start_node):
     nb_nodes = len(graph)
     neighbours_nodes = []
-    for other_node in range(0, nb_nodes-1):
+    for other_node in range(0, nb_nodes - 1):
         if graph[start_node][other_node] == 1:
             neighbours_nodes.append(other_node)
-    for other_node in range(0, nb_nodes-1):
+    for other_node in range(0, nb_nodes - 1):
         if not is_an_isthmus(graph, start_node, other_node):
             return other_node
     return neighbours_nodes.pop()
@@ -159,7 +159,7 @@ When traversing a graph, determine to which node to go without selecting an isth
 def eulerian_cycle(graph, current_node):
     print_graph_matrix(graph)
     degree = 0
-    for other_nodes in range(0, len(graph)-1):
+    for other_nodes in range(0, len(graph) - 1):
         degree += graph[current_node][other_nodes]
     if degree == 0:
         return [current_node]
@@ -171,7 +171,6 @@ def eulerian_cycle(graph, current_node):
         print(next_node)
         print(graph[current_node][next_node])
     return [next_node] + eulerian_cycle(graph, next_node)
-
 
 
 """
@@ -311,6 +310,58 @@ def dijkstra(graph, start_node):
     return explored_nodes
 
 
+"""
+    Breadth First Search algorithm to check if a target node is accessible from a given source node
+"""
+
+
+def breadth_first_search(graph, source_node, target_node, parent_node):
+    visited_nodes = [False] * len(graph)
+    queued_nodes = [source_node]
+    visited_nodes[source_node] = True
+    while queued_nodes:
+        current_node = queued_nodes.pop(0)
+        for node, value in enumerate(graph[current_node]):
+            if visited_nodes[node] is False and value > 0:
+                queued_nodes.append(node)
+                visited_nodes[node] = True
+                parent_node[node] = current_node
+    return True if visited_nodes[target_node] else False
+
+
+"""
+    Ford Fulkerson max possible flow in graph
+"""
+
+
+def ford_fulkerson(graph, source_node, sink_node):
+    # Initialisation de l'infini à la somme de tous les noeuds +1 pour être sur d'avoir une borne supérieure maximum
+    infinite = sum(sum(node) for node in graph) + 1
+    # Initialisation des noeuds parents à -1 car nons parcourus
+    parent = [-1] * len(graph)
+    # Initialisation du flot maximal du graph
+    max_flow = 0
+
+    while breadth_first_search(graph, source_node, sink_node, parent):
+        current_path_flow = infinite
+        current_node = sink_node
+        # Parcours depuis le puits jusqu'à la source et récupération du plus petit flot possible
+        while current_node is not source_node:
+            current_path_flow = min(current_path_flow, graph[parent[current_node]][current_node])
+            current_node = parent[current_node]
+        # Addition des flots
+        max_flow += current_path_flow
+
+        # Mise à jour du graphe résiduel
+        current_back_node = sink_node
+        while current_back_node is not source_node:
+            current_node = parent[current_back_node]
+            graph[current_node][current_back_node] -= current_path_flow
+            graph[current_back_node][current_node] += current_path_flow
+            current_back_node = parent[current_back_node]
+    return max_flow
+
+
 if __name__ == '__main__':
     # Isthmus sequence
     # print("Dessin du graphe en entrée")
@@ -318,11 +369,11 @@ if __name__ == '__main__':
     #       "| \\      / |\n"
     #       "|   A---D  |\n"
     #       "| /      \\ |\n"
-    #       "F          C")M
-    graph = import_matrix('AdjacencyMatrixSamples/Matrice10.txt')
+    #       "F          C")
+    graph = import_matrix('AdjacencyMatrixSamples/Matrice10Ford.txt')
     print('Matrice d\'adjacence correspondante')
     print_graph_matrix(graph)
-    dijkstra(graph, 0)
+    print('Flot maximum du graphe :', ford_fulkerson(graph, 0, 9))
     # print('Vérification de la fonction is_an_isthmus pour l\'arête A,D')
     # print(is_an_isthmus(graph, 0, 3))
     # print('Liste des isthmes')
@@ -334,5 +385,3 @@ if __name__ == '__main__':
     # graph = prompt_for_graph()
     # chain = prompt_for_chain()
     # reduce_chain_if_in_graph(graph,chain)
-
-
